@@ -78,7 +78,6 @@ class INIParser
 public:
 	explicit INIParser(const char* filename);
 	const bpt::iptree& GetIniTree() const;
-	void InsertModule(const ModuleObject& module);
 	const ModuleObject& GetModule(int moduleNumber) const;
 
 private:
@@ -161,7 +160,7 @@ INIParser::INIParser(const char* filename)
 					bpt::iptree& module_tree(m_iniTree.get_child(it->first));
 					std::cout << it->first << '\n';
 					std::cout << module_tree.get<std::string>("TYPE") << '\n';
-                    InsertModule({it->first});
+					m_modules.push_back({it->first});
 				}
 
 				if (it->first.find("B") != std::string::npos)
@@ -169,9 +168,10 @@ INIParser::INIParser(const char* filename)
 					std::cout << it->first << '\n';
 
 					bpt::iptree& module_tree(m_iniTree.get_child(it->first));
-                    std::cout << module_tree.get<std::string>("MODULE") << '\n';
+					std::cout << module_tree.get<std::string>("MODULE") << '\n';
 				}
 			}
+			m_modules.shrink_to_fit();
 		}
 	}
 	catch (bpt::ptree_error&)
@@ -184,11 +184,6 @@ INIParser::INIParser(const char* filename)
 const bpt::iptree& INIParser::GetIniTree() const
 {
 	return m_iniTree;
-}
-
-void INIParser::InsertModule(const ModuleObject& module)
-{
-	m_modules.push_back(module);
 }
 
 const ModuleObject& INIParser::GetModule(int moduleNumber) const
